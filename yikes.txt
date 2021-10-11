@@ -1,3 +1,0 @@
-ligne 1            a
-ceci est la ligne 2
-et la y'a une ligne 3

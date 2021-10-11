@@ -4,9 +4,9 @@
 #include <stdio.h>
 
 
-int ft_find_index(char *str, char c)
+static int	ft_find_index(char *str, char c)
 {
-	int	i;
+	size_t	i;
 
 	i = 0;
 	while (str[i])
@@ -18,63 +18,84 @@ int ft_find_index(char *str, char c)
 	return (-1);
 }
 
-char *ft_make_newline(char *line, char *buffer)
+static int	read_till_newline(int fd, char **remain)
 {
-	char *newline;
+	char	buffer[BUFFER_SIZE + 1];
+	char	*temp;
+	int		bytes_read;
+	int		ret;
 
-	newline = ft_strjoin(line, buffer);
-	free(line);
-	return (newline);
+	bytes_read = 0;
+	while (1)
+	{
+		ft_bzero(buffer, BUFFER_SIZE + 1);
+		ret = read(fd, buffer, BUFFER_SIZE);
+		if (ret == -1 || ret == 0)
+			return (ret);
+		bytes_read += ret;
+		if (*remain)
+		{
+			temp = ft_strjoin(*remain, buffer);
+			free(*remain);
+			*remain = temp;
+		}
+		else
+			*remain = ft_strdup(buffer);
+		if (-1 < ft_find_index(*remain, '\n'))
+			return (bytes_read);
+	}
 }
 
-char *ft_str_get_remain(char buffer[BUFFER_SIZE + 1])
+static char *get_line(char *remain)
 {
-	char *remain;
-	size_t i;
-	size_t j;
+	char *line;
+	int i;
+	int newline_i;
+
+	newline_i = ft_find_index(remain, '\n');
+	line = malloc(sizeof(char) * (newline_i + 1));
+	if (!line)
+		return (NULL);
+	i = 0;
+	while (i < newline_i)
+		line[i++] = remain[i];
+	line[i] = '\0';
+	return (line);
+}
+
+static void	remove_first_line_from_remain(char **remain)
+{
+	char *temp;
+	int i;
+	int j;
 
 	i = 0;
-	while (buffer[i] != '\n' && i < (BUFFER_SIZE))
+	j = 0;
+	while ((*remain)[i] && (*remain)[i] != '\n')
 		i++;
 	i++;
-	j = 0;
-	while (buffer[i + j] && i + j < (BUFFER_SIZE))
-		j++;
-	remain = (char *)malloc(sizeof(char) * (j + 1));
-	if (!remain)
-		return (NULL);
-	ft_strlcpy(remain, &buffer[i], j + 1);
-	return (remain);
+	temp = ft_strdup((*remain) + i);
+	free(*remain);
+	*remain = temp;
 }
 
-int get_next_line(int fd, char **line)
+int	get_next_line(int fd, char **line)
 {
-	char buffer[BUFFER_SIZE + 1];
 	static char *remain;
-	char *temp;
-	int index;
-	int bytes_read;
+	int	read_ret;
 
-	if (remain)
+	if (!remain || ft_find_index(remain, '\n') < 0)
 	{
-		free(*line);
-		*line = ft_strdup(remain);
-	}
-	while (bytes_read = read(fd, buffer, BUFFER_SIZE))
-	{
-		if (bytes_read < 0)
+		read_ret = read_till_newline(fd, &remain);
+		if (read_ret == -1)
 			return (-1);
-		if (-1 < index)
+		if (read_ret == 0)
 		{
-			free(remain);
-			remain = ft_str_get_remain(buffer);
-
-			buffer[index] = '\0';
-			break ;
-		}
-		*line = ft_make_newline(*line, buffer);
-		ft_bzero(buffer, BUFFER_SIZE + 1);
+			*line = ft_strdup(remain);
+			return (0);
+		}	
 	}
-	*line = ft_make_newline(*line, buffer);
-	return (0);
+	*line = get_line(remain);
+	remove_first_line_from_remain(&remain);
+	return (1);
 }
