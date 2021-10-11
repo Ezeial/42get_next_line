@@ -1,8 +1,4 @@
-#include "libft.h"
 #include "get_next_line.h"
-
-#include <stdio.h>
-
 
 static int	ft_find_index(char *str, char c)
 {
@@ -58,7 +54,10 @@ static char *get_line(char *remain)
 		return (NULL);
 	i = 0;
 	while (i < newline_i)
-		line[i++] = remain[i];
+	{
+		line[i] = remain[i];
+		i++;
+	}
 	line[i] = '\0';
 	return (line);
 }
@@ -67,10 +66,8 @@ static void	remove_first_line_from_remain(char **remain)
 {
 	char *temp;
 	int i;
-	int j;
 
 	i = 0;
-	j = 0;
 	while ((*remain)[i] && (*remain)[i] != '\n')
 		i++;
 	i++;
