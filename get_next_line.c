@@ -1,8 +1,18 @@
 #include "get_next_line.h"
 
-static int	ft_find_index(char *str, char c)
+static int		ft_strlen(char const *str)
 {
 	size_t	i;
+
+	i = 0;
+	while (str[i])
+		i++;
+	return (i);
+}
+
+static int		ft_find_index(char *str, char c)
+{
+	int	i;
 
 	i = 0;
 	while (str[i])
@@ -14,85 +24,74 @@ static int	ft_find_index(char *str, char c)
 	return (-1);
 }
 
-static int	read_till_newline(int fd, char **remain)
+static void 	ft_shift_buffer(char buffer[BUFFER_SIZE + 1], int n)
 {
-	char	buffer[BUFFER_SIZE + 1];
-	char	*temp;
-	int		bytes_read;
-	int		ret;
+	size_t	i;
 
-	bytes_read = 0;
-	while (1)
+	i = 0;
+	while (n > 0 && n + i < BUFFER_SIZE + 1)
 	{
-		ft_bzero(buffer, BUFFER_SIZE + 1);
-		ret = read(fd, buffer, BUFFER_SIZE);
-		if (ret == -1 || ret == 0)
-			return (ret);
-		bytes_read += ret;
-		if (*remain)
-		{
-			temp = ft_strjoin(*remain, buffer);
-			free(*remain);
-			*remain = temp;
-		}
-		else
-			*remain = ft_strdup(buffer);
-		if (-1 < ft_find_index(*remain, '\n'))
-			return (bytes_read);
+		buffer[i] = buffer[n + i];
+		i++;
+	}
+	while (i < BUFFER_SIZE + 1)
+	{
+		buffer[i] = 0;
+		i++;
 	}
 }
 
-static char *get_line(char *remain)
+static char 	*ft_join_buffer(char *line, char buffer[BUFFER_SIZE + 1], int n)
 {
-	char *line;
-	int i;
-	int newline_i;
+	int 	len;
+	char 	*joined;
+	int		i;
 
-	newline_i = ft_find_index(remain, '\n');
-	line = malloc(sizeof(char) * (newline_i + 1));
-	if (!line)
+	if (n < 0)
+		len = ft_strlen(buffer);
+	else
+		len = n + 1;
+	if (line)
+		len += ft_strlen(line);
+	joined = malloc(sizeof(char) * (len + 1));
+	if (!joined)
 		return (NULL);
 	i = 0;
-	while (i < newline_i)
-	{
-		line[i] = remain[i];
-		i++;
-	}
-	line[i] = '\0';
-	return (line);
+	while (line && line[i])
+		joined[i++] = line[i];
+	while (i < len)
+		joined[i++] = *buffer++;
+	joined[i] = 0;
+	return (joined); 
 }
 
-static void	remove_first_line_from_remain(char **remain)
+char			*get_next_line(int fd)
 {
-	char *temp;
-	int i;
+	static char buffer[BUFFER_SIZE + 1];
+	char 		*line;
+	char		*temp;
+	int			newline_idx;
 
-	i = 0;
-	while ((*remain)[i] && (*remain)[i] != '\n')
-		i++;
-	i++;
-	temp = ft_strdup((*remain) + i);
-	free(*remain);
-	*remain = temp;
-}
-
-int	get_next_line(int fd, char **line)
-{
-	static char *remain;
-	int	read_ret;
-
-	if (!remain || ft_find_index(remain, '\n') < 0)
+	line = NULL;
+	while (42)
 	{
-		read_ret = read_till_newline(fd, &remain);
-		if (read_ret == -1)
-			return (-1);
-		if (read_ret == 0)
+		newline_idx = ft_find_index(buffer, '\n');
+		temp = line;
+		line = ft_join_buffer(line, buffer, newline_idx);
+		if (temp)
+			free(temp);
+		ft_shift_buffer(buffer, newline_idx + 1);
+		if (0 <= newline_idx)
+			return (line);
+		if (read(fd, buffer, BUFFER_SIZE) <= 0)
 		{
-			*line = ft_strdup(remain);
-			return (0);
-		}	
+			if (!ft_strlen(line))
+			{
+				free(line);
+				return (NULL);
+			}
+			else
+				return (line);
+		}
 	}
-	*line = get_line(remain);
-	remove_first_line_from_remain(&remain);
-	return (1);
 }
