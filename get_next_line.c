@@ -58,7 +58,10 @@ static char 	*ft_join_buffer(char *line, char buffer[BUFFER_SIZE + 1], int n)
 		return (NULL);
 	i = 0;
 	while (line && line[i])
-		joined[i++] = line[i];
+	{
+		joined[i] = line[i];
+		i++;
+	}
 	while (i < len)
 		joined[i++] = *buffer++;
 	joined[i] = 0;
