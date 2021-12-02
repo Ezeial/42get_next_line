@@ -1,16 +1,18 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   get_next_line.c                                    :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: egiraldi <egiraldi@student.42lyon.fr>      +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2021/12/02 14:16:58 by egiraldi          #+#    #+#             */
+/*   Updated: 2021/12/02 14:43:51 by egiraldi         ###   ########lyon.fr   */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "get_next_line.h"
 
-static int		ft_strlen(char const *str)
-{
-	size_t	i;
-
-	i = 0;
-	while (str[i])
-		i++;
-	return (i);
-}
-
-static int		ft_find_index(char *str, char c)
+static int	ft_find_index(char *str, char c)
 {
 	int	i;
 
@@ -21,10 +23,10 @@ static int		ft_find_index(char *str, char c)
 			return (i);
 		i++;
 	}
-	return (-1);
+	return (-42);
 }
 
-static void 	ft_shift_buffer(char buffer[BUFFER_SIZE + 1], int n)
+static void	ft_shift_buffer(char buffer[BUFFER_SIZE + 1], int n)
 {
 	size_t	i;
 
@@ -41,60 +43,37 @@ static void 	ft_shift_buffer(char buffer[BUFFER_SIZE + 1], int n)
 	}
 }
 
-static char 	*ft_join_buffer(char *line, char buffer[BUFFER_SIZE + 1], int n)
+static void	ft_join_buffer(char **line, char buffer[BUFFER_SIZE + 1], int n)
 {
-	int 	len;
-	char 	*joined;
-	int		i;
+	char	*temp;
 
-	if (n < 0)
-		len = ft_strlen(buffer);
+	if (!*line && !ft_strlen(buffer))
+		return ;
+	if (!*line)
+		*line = ft_strnjoin((char *)"", buffer, n);
 	else
-		len = n + 1;
-	if (line)
-		len += ft_strlen(line);
-	joined = malloc(sizeof(char) * (len + 1));
-	if (!joined)
-		return (NULL);
-	i = 0;
-	while (line && line[i])
 	{
-		joined[i] = line[i];
-		i++;
+		temp = *line;
+		*line = ft_strnjoin(*line, buffer, n);
+		free(temp);
 	}
-	while (i < len)
-		joined[i++] = *buffer++;
-	joined[i] = 0;
-	return (joined); 
 }
 
-char			*get_next_line(int fd)
+char	*get_next_line(int fd)
 {
-	static char buffer[BUFFER_SIZE + 1];
-	char 		*line;
-	char		*temp;
+	static char	buffer[BUFFER_SIZE + 1];
+	char		*line;
 	int			newline_idx;
 
 	line = NULL;
 	while (42)
 	{
 		newline_idx = ft_find_index(buffer, '\n');
-		temp = line;
-		line = ft_join_buffer(line, buffer, newline_idx);
-		if (temp)
-			free(temp);
+		ft_join_buffer(&line, buffer, newline_idx + 1);
 		ft_shift_buffer(buffer, newline_idx + 1);
 		if (0 <= newline_idx)
 			return (line);
 		if (read(fd, buffer, BUFFER_SIZE) <= 0)
-		{
-			if (!ft_strlen(line))
-			{
-				free(line);
-				return (NULL);
-			}
-			else
-				return (line);
-		}
+			return (line);
 	}
 }

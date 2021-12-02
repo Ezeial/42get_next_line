@@ -4,8 +4,12 @@
 # include <unistd.h>
 # include <stdlib.h>
 
-// # define BUFFER_SIZE 1000
- 
+# ifndef BUFFER_SIZE
+#  define BUFFER_SIZE 1000
+# endif
+
+size_t	ft_strlen(char const *str);
+char	*ft_strnjoin(char *s1, char *s2, int n);
 char	*get_next_line(int fd);
 
 #endif
