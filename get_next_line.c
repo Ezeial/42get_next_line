@@ -6,7 +6,7 @@
 /*   By: egiraldi <egiraldi@student.42lyon.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/12/02 14:16:58 by egiraldi          #+#    #+#             */
-/*   Updated: 2021/12/02 14:43:51 by egiraldi         ###   ########lyon.fr   */
+/*   Updated: 2021/12/02 14:54:55 by egiraldi         ###   ########lyon.fr   */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -46,15 +46,20 @@ static void	ft_shift_buffer(char buffer[BUFFER_SIZE + 1], int n)
 static void	ft_join_buffer(char **line, char buffer[BUFFER_SIZE + 1], int n)
 {
 	char	*temp;
+	size_t	tojoinlen;
 
+	if (n < 0)
+		tojoinlen = ft_strlen(buffer);
+	else
+		tojoinlen = n;
 	if (!*line && !ft_strlen(buffer))
 		return ;
 	if (!*line)
-		*line = ft_strnjoin((char *)"", buffer, n);
+		*line = ft_strnjoin((char *)"", buffer, tojoinlen);
 	else
 	{
 		temp = *line;
-		*line = ft_strnjoin(*line, buffer, n);
+		*line = ft_strnjoin(*line, buffer, tojoinlen);
 		free(temp);
 	}
 }

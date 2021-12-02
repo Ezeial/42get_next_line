@@ -9,7 +9,7 @@
 # endif
 
 size_t	ft_strlen(char const *str);
-char	*ft_strnjoin(char *s1, char *s2, int n);
+char	*ft_strnjoin(char *s1, char *s2, size_t n);
 char	*get_next_line(int fd);
 
 #endif

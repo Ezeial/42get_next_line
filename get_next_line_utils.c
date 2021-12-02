@@ -6,7 +6,7 @@
 /*   By: egiraldi <egiraldi@student.42lyon.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/12/02 14:16:39 by egiraldi          #+#    #+#             */
-/*   Updated: 2021/12/02 14:40:07 by egiraldi         ###   ########lyon.fr   */
+/*   Updated: 2021/12/02 14:53:05 by egiraldi         ###   ########lyon.fr   */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,14 +22,12 @@ size_t	ft_strlen(char const *str)
 	return (i);
 }
 
-char	*ft_strnjoin(char *s1, char *s2, int n)
+char	*ft_strnjoin(char *s1, char *s2, size_t n)
 {
 	char	*joined;
 	size_t	i;
 	size_t	j;
 
-	if (n < 0)
-		n = ft_strlen(s2);
 	joined = (char *) malloc(sizeof(char) * (ft_strlen(s1) + n + 1));
 	if (!joined)
 		return (NULL);
