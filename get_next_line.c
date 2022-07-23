@@ -49,10 +49,10 @@ static void	ft_join_buffer(char **line, char buffer[BUFFER_SIZE + 1], int n)
 	size_t	tojoinlen;
 
 	if (n < 0)
-		tojoinlen = ft_strlen(buffer);
+		tojoinlen = ft_strlen_gnl(buffer);
 	else
 		tojoinlen = n;
-	if (!*line && !ft_strlen(buffer))
+	if (!*line && !ft_strlen_gnl(buffer))
 		return ;
 	if (!*line)
 		*line = ft_strnjoin((char *)"", buffer, tojoinlen);

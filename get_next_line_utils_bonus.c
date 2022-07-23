@@ -28,7 +28,7 @@ char	*ft_strnjoin(char *s1, char *s2, size_t n)
 	size_t	i;
 	size_t	j;
 
-	joined = (char *) malloc(sizeof(char) * (ft_strlen(s1) + n + 1));
+	joined = (char *) malloc(sizeof(char) * (ft_strlen_gnl(s1) + n + 1));
 	if (!joined)
 		return (NULL);
 	i = 0;
