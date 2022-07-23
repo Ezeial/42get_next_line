@@ -22,7 +22,7 @@
 
 # define MAX_FD 1024
 
-size_t	ft_strlen(char const *str);
+size_t	ft_strlen_gnl(char const *str);
 char	*ft_strnjoin(char *s1, char *s2, size_t n);
 char	*get_next_line(int fd);
 
